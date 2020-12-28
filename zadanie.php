@@ -7,9 +7,10 @@ if (!isset($_SESSION["NFZ"]))
  }
  // ustawiam ręcznie oddział nfz dla późniejszej klasy abstrakcyjnej, aby móc skalować.
 
- abstract class Nfz {
+ abstract class Nfz {//clasa abstrakcyjna
   public $oddzial;
  }
+
 
 
 ?>
