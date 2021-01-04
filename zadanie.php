@@ -60,7 +60,7 @@ class Przychodnia extends Nfz {
   }
 }
 
-class Pacjent extends Przychodnia {
+class Pacjent {
   public $nazwisko;
   public $imie;
   public $pesel;
@@ -75,6 +75,25 @@ class Pacjent extends Przychodnia {
     $this->choroby = "BRAK";
   }
 
+ public function bezPrzychodni($klucz){
+   if ($this->przychodnia == "BRAK")
+    {
+      echo "<b>".$this->nazwisko."</b> (".$this->pesel.") <a href='?przychodnia=lista&dopisz=".$klucz."'>[dopisz]</a><br/>";
+    }
+ }
+
+ public function drukujNazwisko(){
+   echo $this->nazwisko;
+ }
+
+ public function drukujPesel(){
+   echo $this->pesel;
+ }
+
+  public function ustawPrzychodnie($przychodnia){
+    $this->przychodnia = $przychodnia;
+  }
+
   public function utworzenie(){
     echo "<br/>Gratuluję!<br/>";
     echo "Pacjent <b>".$this->nazwisko." ".$this->imie."</b> ";
@@ -85,13 +104,30 @@ class Pacjent extends Przychodnia {
   public function szczegoly() {
     echo "<b>".$this->pesel."</b><br/>";
     echo $this->nazwisko." ".$this->imie."<br/>";
-    echo $this->przychodnia."muszę sprawdzić przychodnię<br/>";
-    echo $this->choroby."muszę sprawdzić choroby<br/>";
 
+    if ($this->przychodnia == "BRAK")
+     {
+       echo "ten pacjent nie ma jeszcze wybranej przychodni";
+     }
+    else
+     {
+      echo "przychodnia: ".$this->przychodnia;
+     }
+    echo "<br/>";
+
+    if ($this->choroby == "BRAK")
+     {
+       echo "Ten pacjent nie ma jeszcze historii chorobowej";
+     }
+    else
+     {
+      echo "tutaj historia chorobowa".$this->choroby;
+     }
+    echo "<br/>";
   }
 
   public function __toString(){
-    return "<b>".$this->nazwisko."</b> (".$this->pesel.")<br/>";
+    return "<b>".$this->nazwisko."</b> (".$this->pesel.")";
   }
 }
 
@@ -186,7 +222,32 @@ class Choroba extends Pacjent {
      }
     else if ($_GET['przychodnia'] == "przypisz")
      {//drukuje pacjentów - nie gotowe
-       print "<p>odczytuje pacjentów nieprzypisanych</p>";
+       // drukuję listę pacjentów z sesji - tylko bez przychodni
+
+     print "<span class='lista'>";
+     $brak_pacjentow = 0;
+     foreach ($_SESSION["PACJENCI"] as $klucze => $wartosci) {
+       $testowanie = $_SESSION["PACJENCI"][$klucze]->bezPrzychodni($klucze);
+       if ($testowanie != FALSE)
+        {
+          print $testowanie;
+          $brak_pacjentow++;
+        }
+     }
+     print "<br/></span>";
+     if ($brak_pacjentow == 0)
+      {
+        print "<span class='info'>wszystkie kartoteki pacjentów z bazy mają przypisaną przychodnię</span>";
+      }
+
+     if (isset($_POST['id']) AND isset($_GET['dopisz']))
+      {
+        $_SESSION["PACJENCI"][$_POST['id']]->ustawPrzychodnie($_POST['przychodnia']);
+        print "<span class='info'>";
+        $_SESSION["PACJENCI"][$_POST['id']]->szczegoly();
+        print "</span>";
+      }
+
      }
   }
 else if (isset($_GET['pacjent']))
@@ -254,14 +315,57 @@ if (isset($_GET['przychodnia']))
  {
    if ($_GET['przychodnia'] == "lista")
     {
+     $zerowa = 0;
 
      print "<span class='info'>";
      if (isset($_GET['placowka']))
       {
         $_SESSION["PRZYCHODNIE"][$_GET['placowka']]->szczegoly();
         print "<a href='?przychodnia=lista&placowka=".$_GET['placowka']."&akcja=usun'>[usuń z bazy]</a>";
+        $zerowa++;
       }
-     else
+
+     if (isset($_GET['dopisz']))
+      {
+?>
+
+<form method="post" action="?przychodnia=przypisz&dopisz=<?php print $_GET['dopisz'];?>">
+ <table>
+  <tr>
+    <td colspan="2" class="top">Formularz dopisania pacenta</td>
+  </tr>
+  <tr>
+    <td class="nazwy">nazwisko:</td>
+    <td><input type="text" name="nazwisko" value="<?php $_SESSION["PACJENCI"][$_GET['dopisz']]->drukujNazwisko();?>" /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">pesel:</td>
+    <td><input type="text" name="pesel" value="<?php $_SESSION["PACJENCI"][$_GET['dopisz']]->drukujPesel();?>" /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">id kartoteki:</td>
+    <td><input type="text" name="id" value=<?php print $_GET['dopisz']; ?> /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">Przychodnia:</td>
+    <td><input type="text" name="przychodnia" value="wpisz nazwę" /></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="button">
+      <input type="reset" value="wyczyść">
+      <input type="submit" value="przypisz kartotekę">
+    </td>
+  </tr>
+ </table>
+</form>
+
+<?php
+
+       $zerowa++;
+      }
+
+
+     if ($zerowa == 0)
       {
        print "wybierz ze środkowej kolumny jednostkę, której szczegóły chcesz zobaczyć";
        print "<br/><br/>";
@@ -269,7 +373,8 @@ if (isset($_GET['przychodnia']))
       }
      print "</span>";
     }
-   else if ($_GET['przychodnia'] == "dodaj")
+
+   if ($_GET['przychodnia'] == "dodaj")
     {// formularz dodawania nowej przychodni
 ?>
 <form method="post" action="?przychodnia=dodaj">
@@ -307,7 +412,7 @@ if (isset($_GET['przychodnia']))
     }
    else if ($_GET['przychodnia'] == "przypisz")
     {
-      print "<p>lista ludzików</p>";
+      print "<span class='info'>wybierz z listy obok kartotekę dla której chcesz przypisać przychodnię. Wyświetlają się tylko te kartoteki, które nie mają zdefiniowanego wyboru.<br/><br/>Jeśli chesz zmienić aktualnie przypisaną przychodnię do kartoteki, której nie widać na tej liście, należy wykonać tę operację poprzez listę pacjentów i wyświetlenie zakładki <b>[info]</b></span>";
     }
  }
 else if (isset($_GET['pacjent']))
