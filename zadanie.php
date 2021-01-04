@@ -50,10 +50,21 @@ class Pacjent extends Przychodnia {
  </p>
 </div>
 <div>
-  <p>drukuję info z bazy (sesji)</p>
+<?php
+ if (isset($_GET['przychodnia']))
+  {
+    print "przychodnia menu";
+  }
+else if (isset($_GET['pacjent']))
+ {
+   print "pacjent menu";
+ }
+?>
 </div>
 <div>
-  <p>formularze obsługowe</p>
+<?php
+
+?>
 </div>
 
 </html>
