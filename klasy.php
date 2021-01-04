@@ -103,7 +103,7 @@ class Pacjent {
  public function utworzenie(){
    echo "<br/>Gratuluję!<br/>";
    echo "Pacjent <b>".$this->nazwisko." ".$this->imie."</b> ";
-   echo "(".$this->pesel.") ma założoną nową kwrtotekę.";
+   echo "(".$this->pesel.") ma stworzoną nową kartotekę.";
    echo "<br/><br/>";
  }
 
