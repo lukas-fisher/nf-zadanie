@@ -1,42 +1,24 @@
 <?php
-session_start();
 
-if (!isset($_SESSION["NFZ"]))
- { // ustawiam ręcznie oddział nfz dla późniejszej klasy abstrakcyjnej, aby móc skalować.
-   $_SESSION["NFZ"] = "15";
- }
-
- if (!isset($_SESSION["PRZYCHODNIE"]))
-  {//tworzę bazę dla przychodni.
-   $_SESSION["PRZYCHODNIE"] = [];
-  }
- if (!isset($_SESSION["PACJENCI"]))
-  {//dla pacjentów.
-   $_SESSION["PACJENCI"] = [];
-  }
- if (!isset($_SESSION["CHOROBY"]))
-  {//dla chorób.
-   $_SESSION["CHOROBY"] = [];
-  }
 
  class Nfz {//klasa powinna być abstrakcyjna?
   public $oddzial_nfz;
 
  }
 
-class Przychodnia extends Nfz {
+class Przychodnia {
   public $nazwa;
   public $miasto;
   public $ulica;
   public $numer_kontaktowy;
-  public $lista_pacjentow = [];
+  public $lista_pacjentow;
 
   public function __construct($nazwa, $miasto, $ulica, $numer_kontaktowy) {
     $this->nazwa = $nazwa;
     $this->miasto = $miasto;
     $this->ulica = $ulica;
     $this->numer_kontaktowy = $numer_kontaktowy;
-    $this->lista_pacjentow = [];
+    $this->lista_pacjentow = "BRAK";
   }
 
   public function utworzenie(){
@@ -64,7 +46,7 @@ class Pacjent {
   public $nazwisko;
   public $imie;
   public $pesel;
-  public $choroby = [];
+  public $choroby;
   public $przychodnia;
 
   public function __construct($nazwisko,$imie,$pesel){
@@ -82,6 +64,16 @@ class Pacjent {
     }
  }
 
+public function podajPrzychodnie(){
+  if ($this->przychodnia == "BRAK")
+   {
+     return FALSE;
+   }
+  else {
+    print $this->przychodnia;
+  }
+}
+
  public function drukujNazwisko(){
    echo $this->nazwisko;
  }
@@ -92,6 +84,7 @@ class Pacjent {
 
   public function ustawPrzychodnie($przychodnia){
     $this->przychodnia = $przychodnia;
+    echo "<b>".$this->nazwisko."</b> (".$this->pesel.") wpisany do <b>".$this->przychodnia."</b>";
   }
 
   public function utworzenie(){
@@ -141,6 +134,25 @@ class Choroba extends Pacjent {
   }
 }
 
+session_start();
+
+if (!isset($_SESSION["NFZ"]))
+ { // ustawiam ręcznie oddział nfz dla późniejszej klasy abstrakcyjnej, aby móc skalować.
+   $_SESSION["NFZ"] = "15";
+ }
+
+ if (!isset($_SESSION["PRZYCHODNIE"]))
+  {//tworzę bazę dla przychodni.
+   $_SESSION["PRZYCHODNIE"] = [];
+  }
+ if (!isset($_SESSION["PACJENCI"]))
+  {//dla pacjentów.
+   $_SESSION["PACJENCI"] = [];
+  }
+ if (!isset($_SESSION["CHOROBY"]))
+  {//dla chorób.
+   $_SESSION["CHOROBY"] = [];
+  }
 
 ?>
 
@@ -152,8 +164,8 @@ class Choroba extends Pacjent {
 </head>
 
 <div>
- <p>NFZ:
-  <ul>Przychodnie:
+ <p>NFZ
+  <ul>Przychodnie
     <li><a href='?przychodnia=lista'>pokaż listę</a></li>
     <li><a href='?przychodnia=dodaj'>dodaj przychodnię</a></li>
     <li><a href='?przychodnia=przypisz'>przypisz pacjenta</a></li>
@@ -161,7 +173,10 @@ class Choroba extends Pacjent {
   <ul>Pacjenci
     <li><a href='?pacjent=lista'>pokaż listę</a></li>
     <li><a href='?pacjent=dodaj'>dodaj pacjenta</a></li>
-
+  </ul>
+  <ul>developer:
+    <li><a href='sesja.php'>zobacz co kryją sesje</a></li>
+    <li><a href='zadanie.php'>widok domyślny</a></li>
   </ul>
  </p>
 </div>
@@ -221,7 +236,15 @@ class Choroba extends Pacjent {
 
      }
     else if ($_GET['przychodnia'] == "przypisz")
-     {//drukuje pacjentów - nie gotowe
+     {//sprawdza czy jest przychodnia do zmiany
+       if (isset($_POST['id']) AND isset($_GET['dopisz']))
+        {
+          print "<span class='info'>";
+          $_SESSION["PACJENCI"][$_POST['id']]->ustawPrzychodnie($_POST['przychodnia']);
+          print "</span><br/>";
+
+        }
+
        // drukuję listę pacjentów z sesji - tylko bez przychodni
 
      print "<span class='lista'>";
@@ -239,15 +262,6 @@ class Choroba extends Pacjent {
       {
         print "<span class='info'>wszystkie kartoteki pacjentów z bazy mają przypisaną przychodnię</span>";
       }
-
-     if (isset($_POST['id']) AND isset($_GET['dopisz']))
-      {
-        $_SESSION["PACJENCI"][$_POST['id']]->ustawPrzychodnie($_POST['przychodnia']);
-        print "<span class='info'>";
-        $_SESSION["PACJENCI"][$_POST['id']]->szczegoly();
-        print "</span>";
-      }
-
      }
   }
 else if (isset($_GET['pacjent']))
@@ -270,7 +284,7 @@ else if (isset($_GET['pacjent']))
       $liczba_pacjentow = 0;
       print "<span class='lista'>";
       foreach ($_SESSION["PACJENCI"] as $klucze => $wartosci) {
-        print "- ".$wartosci." <a href='?pacjent=lista&kartoteka=".$klucze."'>[info]</a> <a href='?pacjent=lista&kartoteka=".$klucze."&akcja=usun'>[del]</a><br/>";
+        print "- ".$wartosci." <a href='?pacjent=lista&kartoteka=".$klucze."'>[info]</a><br/>";
         $liczba_pacjentow++;
       }
       print "<br/></span>";
@@ -291,7 +305,7 @@ else if (isset($_GET['pacjent']))
    else if ($_GET['pacjent'] == "dodaj")
     {
       print "<p>dodaj pacjenta</p>";
-      print "<span class='info'>samo stworzenie pacjenta nie przypisuje go do żadnej przychodni jaka jest utworzona.<br/>Aby przypisać utworzonego pacjenta do konkretneh przychodni skorzystaj z opcji <b>przypisz pacjenta</b> z pierwszej kolumnie po jego utworzeniu<br/>";
+      print "<span class='info'>samo stworzenie pacjenta nie przypisuje go do żadnej przychodni jaka jest utworzona.<br/>Aby przypisać utworzonego pacjenta do konkretnej przychodni skorzystaj z opcji <a href='?przychodnia=przypisz'>Przychodnie->[przypisz pacjenta]</a> po jego utworzeniu<br/>";
 
       if (isset($_POST['pesel']))
        {
@@ -348,7 +362,7 @@ if (isset($_GET['przychodnia']))
   </tr>
   <tr>
     <td class="nazwy">Przychodnia:</td>
-    <td><input type="text" name="przychodnia" value="wpisz nazwę" /></td>
+    <td><input type="text" name="przychodnia" value="wpisz nazwę" autofocus /></td>
   </tr>
   <tr>
     <td colspan="2" class="button">
@@ -412,7 +426,7 @@ if (isset($_GET['przychodnia']))
     }
    else if ($_GET['przychodnia'] == "przypisz")
     {
-      print "<span class='info'>wybierz z listy obok kartotekę dla której chcesz przypisać przychodnię. Wyświetlają się tylko te kartoteki, które nie mają zdefiniowanego wyboru.<br/><br/>Jeśli chesz zmienić aktualnie przypisaną przychodnię do kartoteki, której nie widać na tej liście, należy wykonać tę operację poprzez listę pacjentów i wyświetlenie zakładki <b>[info]</b></span>";
+      print "<span class='info'>wybierz z listy obok kartotekę dla której chcesz przypisać przychodnię. Wyświetlają się tylko te kartoteki, które nie mają zdefiniowanego wyboru.<br/><br/>Jeśli chesz zmienić przypisaną przychodnię do istniejącej kartoteki (której nie widać na tej liście), należy przejść do <a href='?pacjent=lista'>Pacjenci->pokaż listę</a> i wyświetlenie zakładki <b>[info]</b> dla konkretnej kartoteki</span>";
     }
  }
 else if (isset($_GET['pacjent']))
@@ -423,7 +437,8 @@ else if (isset($_GET['pacjent']))
      if (isset($_GET['kartoteka']))
       {
         $_SESSION["PACJENCI"][$_GET['kartoteka']]->szczegoly();
-        print "<a href='?pacjent=lista&kartoteka=".$_GET['kartoteka']."&akcja=usun'>[del]</a>";
+        print "<a href='?pacjent=lista&kartoteka=".$_GET['kartoteka']."&akcja=usun'>[usuń z bazy]</a> ";
+        print "<a href='?przychodnia=lista&dopisz=".$_GET['kartoteka']."'>[wybierz przychodnię]</a>";
       }
      else
       {
