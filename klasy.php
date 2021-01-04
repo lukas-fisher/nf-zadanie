@@ -16,7 +16,7 @@ class Przychodnia {
    $this->miasto = $miasto;
    $this->ulica = $ulica;
    $this->numer_kontaktowy = $numer_kontaktowy;
-   $this->lista_pacjentow = "BRAK";
+   $this->lista_pacjentow = [];
  }
 
  public function utworzenie(){
@@ -33,6 +33,17 @@ public function szczegoly(){
   echo "Ulica: <b>".$this->ulica."</b><br/>";
   echo "Nr kontaktowy: <b>".$this->numer_kontaktowy."</b><br/>";
 
+}
+
+public function podajNazwe($nazwa){
+  if ($this->nazwa == $nazwa)
+   {
+     return TRUE;
+   }
+}
+
+public function dodajPacjenta($pacjent){
+  $this->lista_pacjentow[] = $pacjent;
 }
 
  public function __toString(){
@@ -52,25 +63,15 @@ class Pacjent {
    $this->imie = $imie;
    $this->pesel = $pesel;
    $this->przychodnia = "BRAK";
-   $this->choroby = "BRAK";
  }
 
  public function bezPrzychodni($klucz){
-  if ($this->przychodnia == "BRAK")
-   {
-     echo "<b>".$this->nazwisko."</b> (".$this->pesel.") <a href='?przychodnia=lista&dopisz=".$klucz."'>[dopisz]</a><br/>";
-   }
-  }
-
- public function podajPrzychodnie(){
- if ($this->przychodnia == "BRAK")
+ $zobacz =  $this->przychodnia;
+ if ($zobacz === "BRAK")
   {
-    return FALSE;
+   echo "<b>".$this->nazwisko."</b> (".$this->pesel.") <a href='?przychodnia=lista&dopisz=".$klucz."'>[dopisz]</a><br/>";
   }
- else {
-   print $this->przychodnia;
-  }
-  }
+ }
 
  public function drukujNazwisko(){
   echo $this->nazwisko;
@@ -80,9 +81,17 @@ class Pacjent {
   echo $this->pesel;
 }
 
- public function ustawPrzychodnie($przychodnia){
-   $this->przychodnia = $przychodnia;
-   echo "<b>".$this->nazwisko."</b> (".$this->pesel.") wpisany do <b>".$this->przychodnia."</b>";
+ public function ustawPrzychodnie($przychodnia, $nazwa){
+   if (strlen($przychodnia) == 0)
+    {
+     echo "błąd, nie mozna było przypisać";
+    }
+   else
+    {
+     $this->przychodnia = $przychodnia;
+     echo "<b>".$this->nazwisko."</b> (".$this->pesel.") wpisany do <b>".$nazwa." (ID ".$przychodnia.")</b>";
+    }
+
  }
 
  public function utworzenie(){
@@ -96,13 +105,13 @@ class Pacjent {
    echo "<b>".$this->pesel."</b><br/>";
    echo $this->nazwisko." ".$this->imie."<br/>";
 
-   if ($this->przychodnia == "BRAK")
+   if ($this->przychodnia === "BRAK")
     {
       echo "ten pacjent nie ma jeszcze wybranej przychodni";
     }
    else
     {
-     echo "przychodnia: ".$this->przychodnia;
+     echo "przychodnia: <a href='?przychodnia=lista&placowka=".$this->przychodnia."'>[zobacz]</a>";
     }
    echo "<br/>";
 

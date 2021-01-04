@@ -1,7 +1,8 @@
 <?php
 
 
-include(klasy.php);
+include "klasy.php";
+include "funkcje.php";
 
 session_start();
 
@@ -108,8 +109,12 @@ if (!isset($_SESSION["NFZ"]))
      {//sprawdza czy jest przychodnia do zmiany
        if (isset($_POST['id']) AND isset($_GET['dopisz']))
         {
+          $sprawdz = PoszukajIdPoNazwiePrzychodni($_POST['przychodnia']);
+
           print "<span class='info'>";
-          $_SESSION["PACJENCI"][$_POST['id']]->ustawPrzychodnie($_POST['przychodnia']);
+          $_SESSION["PACJENCI"][$_POST['id']]->ustawPrzychodnie($sprawdz, $_POST['przychodnia']);
+          $_SESSION["PRZYCHODNIE"][$sprawdz]->dodajPacjenta($_GET['dopisz']);
+
           print "</span><br/>";
 
         }
@@ -117,20 +122,13 @@ if (!isset($_SESSION["NFZ"]))
        // drukuję listę pacjentów z sesji - tylko bez przychodni
 
      print "<span class='lista'>";
-     $brak_pacjentow = 0;
      foreach ($_SESSION["PACJENCI"] as $klucze => $wartosci) {
        $testowanie = $_SESSION["PACJENCI"][$klucze]->bezPrzychodni($klucze);
-       if ($testowanie != FALSE)
-        {
-          print $testowanie;
-          $brak_pacjentow++;
-        }
      }
      print "<br/></span>";
-     if ($brak_pacjentow == 0)
-      {
-        print "<span class='info'>wszystkie kartoteki pacjentów z bazy mają przypisaną przychodnię</span>";
-      }
+
+        print "<span class='info'>brak kartotek do przypisania</span>";
+
      }
   }
 else if (isset($_GET['pacjent']))
