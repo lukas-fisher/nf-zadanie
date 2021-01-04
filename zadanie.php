@@ -6,17 +6,17 @@ if (!isset($_SESSION["NFZ"]))
    $_SESSION["NFZ"] = "15";
  }
 
- if (!isset($_SESSION["PRZYCHODNIE"])
+ if (!isset($_SESSION["PRZYCHODNIE"]))
   {//tworzę bazę dla przychodni.
    //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
    $_SESSION["PRZYCHODNIE"] = [];
   }
- if (!isset($_SESSION["PACJENCI"])
+ if (!isset($_SESSION["PACJENCI"]))
   {//dla pacjentów.
    //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
    $_SESSION["PACJENCI"] = [];
   }
- if (!isset($_SESSION["CHOROBY"])
+ if (!isset($_SESSION["CHOROBY"]))
   {//dla chorób.
    //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
    $_SESSION["CHOROBY"] = [];
@@ -97,19 +97,35 @@ class Choroba extends Pacjent {
 
  if (isset($_GET['przychodnia']))
   {
-    print "<p>przychodnia menu</p>";
+    print "<p>MENU PRZYCHODNI</p>";
 
     if ($_GET['przychodnia'] == "lista")
-     {
-       print "<p>lista przychodni</p>";
+     {// tutaj drukuję nazwy z sesji (poźniej bazy danych)
+       $liczba_przychodni = 0;
+       foreach ($_SESSION["PRZYCHODNIE"] as $klucze => $wartosci) {
+         print "- ".$wartosci[$nazwa]."<br/>";
+         $liczba_przychodni++;
+       }
+      //sprawdza ilość wydrukowanych przychodni
+      print "<span class='info'>";
+      if ($liczba_przychodni == 0)
+       {
+        print "najpierw dodaj przychodnię";
+       }
+      else
+       {
+        print "liczba przychodni w bazie: ".$liczba_przychodni;
+       }
+      print "</span>";
+
      }
     else if ($_GET['przychodnia'] == "dodaj")
-     {
-       print "<p>dodaj przychodnię</p>";
+     {//sekcja informacyjna dodawania przychodni
+       print "<span class='info'>użytkowniku,<br/>w aktualnej wersji programu nie będzie można wyedytować danych, trzeba je będzie usunąć i dodać ponownie.</span>";
      }
     else if ($_GET['przychodnia'] == "przypisz")
-     {
-       print "<p>ocdczytuje pacjentów nieprzypisanych</p>";
+     {//drukuje pacjentów
+       print "<p>odczytuje pacjentów nieprzypisanych</p>";
      }
   }
 else if (isset($_GET['pacjent']))
@@ -125,6 +141,10 @@ else if (isset($_GET['pacjent']))
       print "<p>dodaj pacjenta</p>";
     }
  }
+else
+ {
+  print "<p>wybierz akcję z menu</p>";
+ }
 ?>
 </div>
 <div>
@@ -135,11 +155,52 @@ if (isset($_GET['przychodnia']))
  {
    if ($_GET['przychodnia'] == "lista")
     {
-      print "<p>mechniaka list</p>";
+     print "<span class='info'>";
+     if (isset($_GET['placowka']))
+      {
+        print "szczogóły placówki";
+      }
+     else
+      {
+       print "wybierz ze środkowej kolumny jednostkę, której szczegóły chcesz zobaczyć";
+      }
+     print "</span>";
     }
    else if ($_GET['przychodnia'] == "dodaj")
-    {
-      print "<p>dodawanie przychodni</p>";
+    {// formularz dodawania nowej przychodni
+?>
+<form method="post" action="?przychodnia=dodaj">
+ <table>
+  <tr>
+    <td colspan="2" class="top">Formularz nowej przychodni</td>
+  </tr>
+  <tr>
+    <td class="nazwy">nazwa:</td>
+    <td><input type="text" name="nazwa" /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">miasto:</td>
+    <td><input type="text" name="miasto" /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">ulica:</td>
+    <td><input type="text" name="ulica" /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">nr telefonu:</td>
+    <td><input type="text" name="telefon" /></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="button">
+      <input type="reset" value="wyczyść">
+      <input type="submit" value="dodaj przychodnię">
+    </td>
+  </tr>
+ </table>
+</form>
+
+<?php
+
     }
    else if ($_GET['przychodnia'] == "przypisz")
     {
@@ -156,6 +217,9 @@ else if (isset($_GET['pacjent']))
    {
      print "<p>formularz dodawania pacjenta</p>";
    }
+}
+else {
+  print "<p>wybierz akcję z menu</p>";
 }
 ?>
 </div>
