@@ -7,10 +7,23 @@ if (!isset($_SESSION["NFZ"]))
  }
  // ustawiam ręcznie oddział nfz dla późniejszej klasy abstrakcyjnej, aby móc skalować.
 
- abstract class Nfz {//clasa abstrakcyjna
-  public $oddzial;
+ class Nfz {//klasa powinna być abstrakcyjna?
+  public $oddzial_nfz;
+
  }
 
+class Przychodnia extends Nfz {
+  public $nazwa;
+  public $miasto;
+  public $lista_pacjentow;
+}
+
+class Pacjent extends Przychodnia {
+  public $nazwisko;
+  public $imie;
+  public $pesel;
+  public $choroby;
+}
 
 
 ?>
