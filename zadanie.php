@@ -8,17 +8,14 @@ if (!isset($_SESSION["NFZ"]))
 
  if (!isset($_SESSION["PRZYCHODNIE"]))
   {//tworzę bazę dla przychodni.
-   //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
    $_SESSION["PRZYCHODNIE"] = [];
   }
  if (!isset($_SESSION["PACJENCI"]))
   {//dla pacjentów.
-   //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
    $_SESSION["PACJENCI"] = [];
   }
  if (!isset($_SESSION["CHOROBY"]))
   {//dla chorób.
-   //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
    $_SESSION["CHOROBY"] = [];
   }
 
@@ -68,12 +65,33 @@ class Pacjent extends Przychodnia {
   public $imie;
   public $pesel;
   public $choroby = [];
+  public $przychodnia;
 
-  public function __construct($nazwisko,$imie,$pesel,$choroba){
+  public function __construct($nazwisko,$imie,$pesel){
     $this->nazwisko = $nazwisko;
     $this->imie = $imie;
     $this->pesel = $pesel;
-    $this->choroby = $choroba;
+    $this->przychodnia = "BRAK";
+    $this->choroby = "BRAK";
+  }
+
+  public function utworzenie(){
+    echo "<br/>Gratuluję!<br/>";
+    echo "Pacjent <b>".$this->nazwisko." ".$this->imie."</b> ";
+    echo "(".$this->pesel.") ma założoną nową kwrtotekę.";
+    echo "<br/><br/>";
+  }
+
+  public function szczegoly() {
+    echo "<b>".$this->pesel."</b><br/>";
+    echo $this->nazwisko." ".$this->imie."<br/>";
+    echo $this->przychodnia."muszę sprawdzić przychodnię<br/>";
+    echo $this->choroby."muszę sprawdzić choroby<br/>";
+
+  }
+
+  public function __toString(){
+    return "<b>".$this->nazwisko."</b> (".$this->pesel.")<br/>";
   }
 }
 
@@ -120,7 +138,8 @@ class Choroba extends Pacjent {
     print "<p>MENU PRZYCHODNI</p>";
 
     if ($_GET['przychodnia'] == "lista")
-     {// tutaj drukuję nazwy z sesji (poźniej bazy danych)
+     {
+      // najpierw sprawdzam czy jest jakaś przychodnia do usunięcia
        if (isset($_GET['akcja']))
         {
           if ($_GET['akcja'] == "usun")
@@ -128,14 +147,17 @@ class Choroba extends Pacjent {
             unset ($_SESSION["PRZYCHODNIE"][$_GET['placowka']]);
             unset ($_GET['placowka']);
            }
-        }       
+        }
+
+      // tutaj drukuję nazwy z sesji (poźniej bazy danych)
        $liczba_przychodni = 0;
        print "<span class='lista'>";
        foreach ($_SESSION["PRZYCHODNIE"] as $klucze => $wartosci) {
          print "- ".$wartosci." <a href='?przychodnia=lista&placowka=".$klucze."'>[szczegóły]</a><br/>";
          $liczba_przychodni++;
        }
-       print "</span>";
+       print "<br/></span>";
+
       //sprawdza ilość wydrukowanych przychodni
       print "<span class='info'>";
       if ($liczba_przychodni == 0)
@@ -163,21 +185,59 @@ class Choroba extends Pacjent {
 
      }
     else if ($_GET['przychodnia'] == "przypisz")
-     {//drukuje pacjentów
+     {//drukuje pacjentów - nie gotowe
        print "<p>odczytuje pacjentów nieprzypisanych</p>";
      }
   }
 else if (isset($_GET['pacjent']))
  {
-   print "<p>pacjent menu</p>";
+   print "<p>MENU PACJENTA</p>";
 
    if ($_GET['pacjent'] == "lista")
     {
-      print "<p>lista pacjentów</p>";
+     // najpierw sprawdzam czy jest jakaś kartoteka do usunięcia
+     if (isset($_GET['akcja']))
+      {
+        if ($_GET['akcja'] == "usun")
+         {
+          unset ($_SESSION["PACJENCI"][$_GET['kartoteka']]);
+          unset ($_GET['kartoteka']);
+         }
+      }
+
+      // drukuję listę pacjentów z sesji
+      $liczba_pacjentow = 0;
+      print "<span class='lista'>";
+      foreach ($_SESSION["PACJENCI"] as $klucze => $wartosci) {
+        print "- ".$wartosci." <a href='?pacjent=lista&kartoteka=".$klucze."'>[info]</a> <a href='?pacjent=lista&kartoteka=".$klucze."&akcja=usun'>[del]</a><br/>";
+        $liczba_pacjentow++;
+      }
+      print "<br/></span>";
+
+      //sprawdzam ilość wydrukowanych pacjentówarning
+      print "<span class='info'>";
+      if ($liczba_pacjentow == 0)
+       {
+         print "najpierw dodaj pacjentów do bazy";
+       }
+      else
+       {
+        print "liczba kartotek w bazie: ".$liczba_pacjentow;
+       }
+      print "</span>";
+
     }
    else if ($_GET['pacjent'] == "dodaj")
     {
       print "<p>dodaj pacjenta</p>";
+      print "<span class='info'>samo stworzenie pacjenta nie przypisuje go do żadnej przychodni jaka jest utworzona.<br/>Aby przypisać utworzonego pacjenta do konkretneh przychodni skorzystaj z opcji <b>przypisz pacjenta</b> z pierwszej kolumnie po jego utworzeniu<br/>";
+
+      if (isset($_POST['pesel']))
+       {
+         $pacjent = new Pacjent($_POST['nazwisko'], $_POST['imie'], $_POST['pesel']);
+         $pacjent->utworzenie();
+         $_SESSION["PACJENCI"][] = $pacjent;
+       }
     }
  }
 else
@@ -254,15 +314,56 @@ else if (isset($_GET['pacjent']))
 {
   if ($_GET['pacjent'] == "lista")
    {
-     print "<p>lista wszytskich pacentów</p>";
+     print "<span class='info'>";
+     if (isset($_GET['kartoteka']))
+      {
+        $_SESSION["PACJENCI"][$_GET['kartoteka']]->szczegoly();
+        print "<a href='?pacjent=lista&kartoteka=".$_GET['kartoteka']."&akcja=usun'>[del]</a>";
+      }
+     else
+      {
+       print "wybierz ze środkowej kolumny kartotekę pacjenta, której szczegóły chcesz zobaczyć";
+       print "<br/><br/>";
+       print "po wyświetleniu szczegółów będzie można zobaczyć jakie opcje są dla niej dostępne z tego poziomu aplikacji.";
+      }
+     print "</span>";
    }
   else if ($_GET['pacjent'] == "dodaj")
    {
-     print "<p>formularz dodawania pacjenta</p>";
+     {// formularz dodawania nowego pacjenta
+ ?>
+ <form method="post" action="?pacjent=dodaj">
+  <table>
+   <tr>
+     <td colspan="2" class="top">Formularz nowego pacjenta</td>
+   </tr>
+   <tr>
+     <td class="nazwy">nazwisko:</td>
+     <td><input type="text" name="nazwisko" /></td>
+   </tr>
+   <tr>
+     <td class="nazwy">imię:</td>
+     <td><input type="text" name="imie" /></td>
+   </tr>
+   <tr>
+     <td class="nazwy">pesel:</td>
+     <td><input type="text" name="pesel" /></td>
+   </tr>
+   <tr>
+     <td colspan="2" class="button">
+       <input type="reset" value="wyczyść">
+       <input type="submit" value="utwórz kartotekę pacjenta">
+     </td>
+   </tr>
+  </table>
+ </form>
+
+ <?php
    }
 }
 else {
   print "<p>wybierz akcję z menu</p>";
+}
 }
 ?>
 </div>
