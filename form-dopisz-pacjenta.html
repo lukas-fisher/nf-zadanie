@@ -1,0 +1,29 @@
+<form method="post" action="?przychodnia=przypisz&dopisz=<?php print $_GET['dopisz'];?>">
+ <table>
+  <tr>
+    <td colspan="2" class="top">Formularz dopisania pacenta</td>
+  </tr>
+  <tr>
+    <td class="nazwy">nazwisko:</td>
+    <td><input type="text" name="nazwisko" value="<?php $_SESSION["PACJENCI"][$_GET['dopisz']]->drukujNazwisko();?>" /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">pesel:</td>
+    <td><input type="text" name="pesel" value="<?php $_SESSION["PACJENCI"][$_GET['dopisz']]->drukujPesel();?>" /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">id kartoteki:</td>
+    <td><input type="text" name="id" value=<?php print $_GET['dopisz']; ?> /></td>
+  </tr>
+  <tr>
+    <td class="nazwy">Przychodnia:</td>
+    <td><input type="text" name="przychodnia" value="wpisz nazwę" autofocus /></td>
+  </tr>
+  <tr>
+    <td colspan="2" class="button">
+      <input type="reset" value="wyczyść">
+      <input type="submit" value="przypisz kartotekę">
+    </td>
+  </tr>
+ </table>
+</form>

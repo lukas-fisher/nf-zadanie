@@ -31,7 +31,13 @@ public function szczegoly(){
   echo "Przychodnia: <b>".$this->nazwa."</b><br/>";
   echo "Miasto: <b>".$this->miasto."</b><br/>";
   echo "Ulica: <b>".$this->ulica."</b><br/>";
-  echo "Nr kontaktowy: <b>".$this->numer_kontaktowy."</b><br/>";
+  echo "Nr kontaktowy: <b>".$this->numer_kontaktowy."</b><br/><br/>";
+  echo "Aktualnie zapisani pacjenci:<br/>";
+  foreach ($this->lista_pacjentow as $klucze => $wartosci)
+   {
+     $_SESSION["PACJENCI"][$wartosci]->drukujNazwisko();
+     echo " <a href='?pacjent=lista&kartoteka=".$wartosci."'>[info]</a><br/>";
+   }
 
 }
 

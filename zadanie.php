@@ -201,47 +201,14 @@ if (isset($_GET['przychodnia']))
      print "<span class='info'>";
      if (isset($_GET['placowka']))
       {
+        print "<a href='?przychodnia=lista&placowka=".$_GET['placowka']."&akcja=usun'>[usuń placówkę z bazy]</a><br/>";
         $_SESSION["PRZYCHODNIE"][$_GET['placowka']]->szczegoly();
-        print "<a href='?przychodnia=lista&placowka=".$_GET['placowka']."&akcja=usun'>[usuń z bazy]</a>";
         $zerowa++;
       }
 
      if (isset($_GET['dopisz']))
-      {
-?>
-
-<form method="post" action="?przychodnia=przypisz&dopisz=<?php print $_GET['dopisz'];?>">
- <table>
-  <tr>
-    <td colspan="2" class="top">Formularz dopisania pacenta</td>
-  </tr>
-  <tr>
-    <td class="nazwy">nazwisko:</td>
-    <td><input type="text" name="nazwisko" value="<?php $_SESSION["PACJENCI"][$_GET['dopisz']]->drukujNazwisko();?>" /></td>
-  </tr>
-  <tr>
-    <td class="nazwy">pesel:</td>
-    <td><input type="text" name="pesel" value="<?php $_SESSION["PACJENCI"][$_GET['dopisz']]->drukujPesel();?>" /></td>
-  </tr>
-  <tr>
-    <td class="nazwy">id kartoteki:</td>
-    <td><input type="text" name="id" value=<?php print $_GET['dopisz']; ?> /></td>
-  </tr>
-  <tr>
-    <td class="nazwy">Przychodnia:</td>
-    <td><input type="text" name="przychodnia" value="wpisz nazwę" autofocus /></td>
-  </tr>
-  <tr>
-    <td colspan="2" class="button">
-      <input type="reset" value="wyczyść">
-      <input type="submit" value="przypisz kartotekę">
-    </td>
-  </tr>
- </table>
-</form>
-
-<?php
-
+      {//formularz obsługujący dopisanie pacjenta do przychodni
+       include "form-dopisz-pacjenta.html";
        $zerowa++;
       }
 
@@ -257,39 +224,7 @@ if (isset($_GET['przychodnia']))
 
    if ($_GET['przychodnia'] == "dodaj")
     {// formularz dodawania nowej przychodni
-?>
-<form method="post" action="?przychodnia=dodaj">
- <table>
-  <tr>
-    <td colspan="2" class="top">Formularz nowej przychodni</td>
-  </tr>
-  <tr>
-    <td class="nazwy">nazwa:</td>
-    <td><input type="text" name="nazwa" /></td>
-  </tr>
-  <tr>
-    <td class="nazwy">miasto:</td>
-    <td><input type="text" name="miasto" /></td>
-  </tr>
-  <tr>
-    <td class="nazwy">ulica:</td>
-    <td><input type="text" name="ulica" /></td>
-  </tr>
-  <tr>
-    <td class="nazwy">nr telefonu:</td>
-    <td><input type="text" name="telefon" /></td>
-  </tr>
-  <tr>
-    <td colspan="2" class="button">
-      <input type="reset" value="wyczyść">
-      <input type="submit" value="dodaj przychodnię">
-    </td>
-  </tr>
- </table>
-</form>
-
-<?php
-
+      include "form-nowa-przychodnia.html";
     }
    else if ($_GET['przychodnia'] == "przypisz")
     {
