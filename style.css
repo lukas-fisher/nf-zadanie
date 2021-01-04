@@ -1,0 +1,26 @@
+div {
+  display: inline-block;
+  vertical-align: top;
+  border: 1px solid;
+  padding: 10px;
+  width: 30%;
+  height: 30vh;
+}
+
+p, ul, li, a {
+  font-family: verdana;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+p {
+  color: rgb(150,0,0);
+}
+
+ul {
+  color: rgb(0,150,0);
+}
+
+a {
+  color: rgb(0,0,150);
+}
