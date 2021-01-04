@@ -2,10 +2,25 @@
 session_start();
 
 if (!isset($_SESSION["NFZ"]))
- {
+ { // ustawiam ręcznie oddział nfz dla późniejszej klasy abstrakcyjnej, aby móc skalować.
    $_SESSION["NFZ"] = "15";
  }
- // ustawiam ręcznie oddział nfz dla późniejszej klasy abstrakcyjnej, aby móc skalować.
+
+ if (!isset($_SESSION["PRZYCHODNIE"])
+  {//tworzę bazę dla przychodni.
+   //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
+   $_SESSION["PRZYCHODNIE"] = [];
+  }
+ if (!isset($_SESSION["PACJENCI"])
+  {//dla pacjentów.
+   //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
+   $_SESSION["PACJENCI"] = [];
+  }
+ if (!isset($_SESSION["CHOROBY"])
+  {//dla chorób.
+   //dla lepszego skalowania na bazy dancyh jest to jedna tablica sesji do póżniejszego przeniesienie na mysql
+   $_SESSION["CHOROBY"] = [];
+  }
 
  class Nfz {//klasa powinna być abstrakcyjna?
   public $oddzial_nfz;
@@ -33,6 +48,23 @@ class Pacjent extends Przychodnia {
   public $imie;
   public $pesel;
   public $choroby = [];
+
+  public function __construct($nazwisko,$imie,$pesel,$choroba){
+    $this->nazwisko = $nazwisko;
+    $this->imie = $imie;
+    $this->pesel = $pesel;
+    $this->choroby = $choroba;
+  }
+}
+
+class Choroba extends Pacjent {
+  public $kod_choroby;
+  public $nazwa_choroby;
+
+  public function __construct($kod, $nazwa){
+    $this->kod_choroby = $kod;
+    $this->nazwa_choroby = $nazwa;
+  }
 }
 
 
