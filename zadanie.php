@@ -27,3 +27,44 @@ class Pacjent extends Przychodnia {
 
 
 ?>
+
+<html  lang='pl'>
+<head>
+  <title>system NFZ</title>
+  <meta charset='UTF-8' />
+  <link rel='stylesheet' href='style.css'>
+</head>
+
+<div>
+ <p>NFZ:
+  <ul>Przychodnie:
+    <li><a href='?przychodnia=lista'>pokaż listę</a></li>
+    <li><a href='?przychodnia=dodaj'>dodaj przychodnię</a></li>
+    <li><a href='?przychodnia=przypisz'>przypisz pacjenta</a></li>
+  </ul>
+  <ul>Pacjenci
+    <li><a href='?pacjent=lista'>pokaż listę</a></li>
+    <li><a href='?pacjent=dodaj'>dodaj pacjenta</a></li>
+
+  </ul>
+ </p>
+</div>
+<div>
+<?php
+ if (isset($_GET['przychodnia']))
+  {
+    print "przychodnia menu";
+  }
+else if (isset($_GET['pacjent']))
+ {
+   print "pacjent menu";
+ }
+?>
+</div>
+<div>
+<?php
+
+?>
+</div>
+
+</html>
