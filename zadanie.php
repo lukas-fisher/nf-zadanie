@@ -34,12 +34,32 @@ class Przychodnia extends Nfz {
   public $numer_kontaktowy;
   public $lista_pacjentow = [];
 
-  public function __construct($nazwa, $miasto, $ulica, $numer_kontaktowy, $lista_pacjentow) {
+  public function __construct($nazwa, $miasto, $ulica, $numer_kontaktowy) {
     $this->nazwa = $nazwa;
     $this->miasto = $miasto;
     $this->ulica = $ulica;
     $this->numer_kontaktowy = $numer_kontaktowy;
-    $this->lista_pacjentow = $lista_pacjentow;
+    $this->lista_pacjentow = [];
+  }
+
+  public function utworzenie(){
+    echo "Gratuluję!<br/>";
+    echo "Przychodnia <b>".$this->nazwa."</b> może przyjmować pacjentów z miasta: <b>";
+    echo $this->miasto."</b> w okolicy ulica <b>".$this->ulica."</b><br/>";
+    echo "Dodatkowo w bazie zapisano numer kontaktowy: ".$this->numer_kontaktowy;
+    echo "<br/><br/>";
+  }
+
+ public function szczegoly(){
+   echo "Przychodnia: <b>".$this->nazwa."</b><br/>";
+   echo "Miasto: <b>".$this->miasto."</b><br/>";
+   echo "Ulica: <b>".$this->ulica."</b><br/>";
+   echo "Nr kontaktowy: <b>".$this->numer_kontaktowy."</b><br/>";
+
+ }
+
+  public function __toString(){
+    return "<b>".$this->nazwa."</b> (".$this->miasto.") ";
   }
 }
 
@@ -101,11 +121,21 @@ class Choroba extends Pacjent {
 
     if ($_GET['przychodnia'] == "lista")
      {// tutaj drukuję nazwy z sesji (poźniej bazy danych)
+       if (isset($_GET['akcja']))
+        {
+          if ($_GET['akcja'] == "usun")
+           {
+            unset ($_SESSION["PRZYCHODNIE"][$_GET['placowka']]);
+            unset ($_GET['placowka']);
+           }
+        }       
        $liczba_przychodni = 0;
+       print "<span class='lista'>";
        foreach ($_SESSION["PRZYCHODNIE"] as $klucze => $wartosci) {
-         print "- ".$wartosci[$nazwa]."<br/>";
+         print "- ".$wartosci." <a href='?przychodnia=lista&placowka=".$klucze."'>[szczegóły]</a><br/>";
          $liczba_przychodni++;
        }
+       print "</span>";
       //sprawdza ilość wydrukowanych przychodni
       print "<span class='info'>";
       if ($liczba_przychodni == 0)
@@ -121,7 +151,16 @@ class Choroba extends Pacjent {
      }
     else if ($_GET['przychodnia'] == "dodaj")
      {//sekcja informacyjna dodawania przychodni
-       print "<span class='info'>użytkowniku,<br/>w aktualnej wersji programu nie będzie można wyedytować danych, trzeba je będzie usunąć i dodać ponownie.</span>";
+       print "<span class='info'>użytkowniku,<br/>w aktualnej wersji programu nie będzie można wyedytować danych, trzeba je będzie usunąć i dodać ponownie.<br/><br/>";
+
+       if (isset($_POST['nazwa']))
+        {
+          $przychodnia = new Przychodnia($_POST['nazwa'], $_POST['miasto'], $_POST['ulica'], $_POST['telefon']);
+          $przychodnia->utworzenie();
+          $_SESSION["PRZYCHODNIE"][] = $przychodnia;
+        }
+       print "</span>";
+
      }
     else if ($_GET['przychodnia'] == "przypisz")
      {//drukuje pacjentów
@@ -155,14 +194,18 @@ if (isset($_GET['przychodnia']))
  {
    if ($_GET['przychodnia'] == "lista")
     {
+
      print "<span class='info'>";
      if (isset($_GET['placowka']))
       {
-        print "szczogóły placówki";
+        $_SESSION["PRZYCHODNIE"][$_GET['placowka']]->szczegoly();
+        print "<a href='?przychodnia=lista&placowka=".$_GET['placowka']."&akcja=usun'>[usuń z bazy]</a>";
       }
      else
       {
        print "wybierz ze środkowej kolumny jednostkę, której szczegóły chcesz zobaczyć";
+       print "<br/><br/>";
+       print "po wyświetleniu szczegółów będzie można zobaczyć jakie opcje są dostępne.";
       }
      print "</span>";
     }

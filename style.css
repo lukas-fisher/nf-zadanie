@@ -7,7 +7,7 @@ div {
   height: 30vh;
 }
 
-p, ul, li, a {
+p, ul, li {
   font-family: verdana;
   font-size: 16px;
   text-decoration: none;
@@ -22,7 +22,16 @@ ul {
 }
 
 a {
+  font-family: verdana;
+  font-size: 12px;
+  text-decoration: none;
   color: rgb(0,0,150);
+}
+
+span.lista {
+  font-family: verdana;
+  font-size: 12px;
+  color: rgb(13,13,13);
 }
 
 span.info {
