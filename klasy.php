@@ -1,7 +1,6 @@
 <?php
 class Nfz {//klasa powinna być abstrakcyjna?
  public $oddzial_nfz;
-
 }
 
 class Przychodnia {
@@ -27,7 +26,7 @@ class Przychodnia {
    echo "<br/><br/>";
  }
 
-public function szczegoly(){
+ public function szczegoly(){
   echo "Przychodnia: <b>".$this->nazwa."</b><br/>";
   echo "Miasto: <b>".$this->miasto."</b><br/>";
   echo "Ulica: <b>".$this->ulica."</b><br/>";
@@ -38,19 +37,29 @@ public function szczegoly(){
      $_SESSION["PACJENCI"][$wartosci]->drukujNazwisko();
      echo " <a href='?pacjent=lista&kartoteka=".$wartosci."'>[info]</a><br/>";
    }
+ }
 
-}
-
-public function podajNazwe($nazwa){
+ public function podajNazwe($nazwa){
   if ($this->nazwa == $nazwa)
    {
      return TRUE;
    }
-}
+ }
 
-public function dodajPacjenta($pacjent){
+ public function dodajPacjenta($pacjent){
   $this->lista_pacjentow[] = $pacjent;
-}
+ }
+
+ public function usunPacjenta($pacjent){
+  foreach ($this->lista_pacjentow as $klucze => $wartosci)
+   {
+    if ($wartosci === $pacjent)
+     {
+       unset($this->lista_pacjentow[$klucze]);
+       echo "<h1>usuwam ".$wartosci." | podano ".$pacjent."</h1>";
+     }
+   }
+ }
 
  public function __toString(){
    return "<b>".$this->nazwa."</b> (".$this->miasto.") ";
@@ -72,30 +81,34 @@ class Pacjent {
  }
 
  public function bezPrzychodni($klucz){
- $zobacz =  $this->przychodnia;
- if ($zobacz === "BRAK")
-  {
-   echo "<b>".$this->nazwisko."</b> (".$this->pesel.") <a href='?przychodnia=lista&dopisz=".$klucz."'>[dopisz]</a><br/>";
-  }
+  $zobacz =  $this->przychodnia;
+  if ($zobacz === "BRAK")
+   {
+    echo "<b>".$this->nazwisko."</b> (".$this->pesel.") <a href='?przychodnia=lista&dopisz=".$klucz."'>[dopisz]</a><br/>";
+   }
  }
 
  public function drukujNazwisko(){
   echo $this->nazwisko;
-}
+ }
 
  public function drukujPesel(){
   echo $this->pesel;
-}
+ }
+
+ public function zobaczPrzychodnie(){
+  return $this->przychodnia;
+ }
 
  public function ustawPrzychodnie($przychodnia, $nazwa){
    if (strlen($przychodnia) == 0)
     {
-     echo "błąd, nie mozna było przypisać";
+     echo "błąd, nie mozna było przypisać ".$nazwa."<br/>";
     }
    else
     {
      $this->przychodnia = $przychodnia;
-     echo "<b>".$this->nazwisko."</b> (".$this->pesel.") wpisany do <b>".$nazwa." (ID ".$przychodnia.")</b>";
+     echo "<b>".$this->nazwisko."</b> (".$this->pesel.") wpisany do <a href='?przychodnia=lista&placowka=".$this->przychodnia."'>".$nazwa."</a><br/>";
     }
 
  }
@@ -137,13 +150,17 @@ class Pacjent {
  }
 }
 
-class Choroba extends Pacjent {
- public $kod_choroby;
- public $nazwa_choroby;
+class Choroba {
+ public $icd10;
+ public $nazwa;
 
  public function __construct($kod, $nazwa){
-   $this->kod_choroby = $kod;
-   $this->nazwa_choroby = $nazwa;
+   $this->icd10 = $kod;
+   $this->nazwa = $nazwa;
+ }
+
+ public function __toString(){
+   return "<b>[".$this->icd10."]</b> - ".$this->nazwa."<br/>";
  }
 }
 
