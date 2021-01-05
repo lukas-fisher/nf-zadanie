@@ -1,9 +1,9 @@
 <?php
 class Nfz {//klasa powinna być abstrakcyjna?
- public $oddzial_nfz = $_SESSION["NFZ"];
+ public $oddzial_nfz;
 }
 
-class Przychodnia extends Nfz{
+class Przychodnia {
  public $nazwa;
  public $miasto;
  public $ulica;
@@ -44,6 +44,13 @@ class Przychodnia extends Nfz{
 
  public function drukujNazwe(){
    echo $this->nazwa;
+ }
+
+ public function podajNazwe($nazwa){
+   if ($this->nazwa == $nazwa)
+    {
+      return $nazwa;
+    }
  }
 
  public function dodajPacjenta($pacjent){
