@@ -46,6 +46,10 @@ class Przychodnia {
    }
  }
 
+ public function drukujNazwe(){
+   echo $this->nazwa;
+ }
+
  public function dodajPacjenta($pacjent){
   $this->lista_pacjentow[] = $pacjent;
  }
@@ -70,7 +74,7 @@ class Pacjent {
  public $nazwisko;
  public $imie;
  public $pesel;
- public $choroby;
+ public $choroby = [];
  public $przychodnia;
 
  public function __construct($nazwisko,$imie,$pesel){
@@ -121,8 +125,9 @@ class Pacjent {
  }
 
  public function szczegoly() {
-   echo "<b>".$this->pesel."</b><br/>";
-   echo $this->nazwisko." ".$this->imie."<br/>";
+   echo "PESEL: <b>".$this->pesel."</b><br/>";
+   echo "Nazwisko, Imię:<br/>";
+   echo "<b>".$this->nazwisko.", ".$this->imie."</b><br/>";
 
    if ($this->przychodnia === "BRAK")
     {
@@ -130,19 +135,29 @@ class Pacjent {
     }
    else
     {
-     echo "przychodnia: <a href='?przychodnia=lista&placowka=".$this->przychodnia."'>[zobacz]</a>";
+     echo "przychodnia: <a href='?przychodnia=lista&placowka=".$this->przychodnia."'>[";
+      $nazwa = $_SESSION["PRZYCHODNIE"][$this->przychodnia]->drukujNazwe();
+     echo "]</a>";
     }
    echo "<br/>";
 
-   if ($this->choroby == "BRAK")
+   if (count($this->choroby) == 0)
     {
       echo "Ten pacjent nie ma jeszcze historii chorobowej";
     }
    else
     {
-     echo "tutaj historia chorobowa".$this->choroby;
+      echo "Przebyte choroby:<br/>";
+     foreach ($this->choroby as $klucze => $wartosci)
+      {
+       echo $_SESSION["CHOROBY"][$wartosci];
+      }
     }
    echo "<br/>";
+ }
+
+ public function zapiszChorobe($kod){
+   $this->choroby[] = $kod;
  }
 
  public function __toString(){
