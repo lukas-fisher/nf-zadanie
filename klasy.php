@@ -1,9 +1,9 @@
 <?php
 class Nfz {//klasa powinna być abstrakcyjna?
- public $oddzial_nfz;
+ public $oddzial_nfz = $_SESSION["NFZ"];
 }
 
-class Przychodnia {
+class Przychodnia extends Nfz{
  public $nazwa;
  public $miasto;
  public $ulica;
@@ -35,14 +35,10 @@ class Przychodnia {
   foreach ($this->lista_pacjentow as $klucze => $wartosci)
    {
      $_SESSION["PACJENCI"][$wartosci]->drukujNazwisko();
+     echo " (";
+     $_SESSION["PACJENCI"][$wartosci]->drukujPesel();
+     echo ") ";
      echo " <a href='?pacjent=lista&kartoteka=".$wartosci."'>[info]</a><br/>";
-   }
- }
-
- public function podajNazwe($nazwa){
-  if ($this->nazwa == $nazwa)
-   {
-     return TRUE;
    }
  }
 
