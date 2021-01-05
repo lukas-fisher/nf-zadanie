@@ -51,7 +51,7 @@ if (!isset($_SESSION["NFZ"]))
   <ul>Choroby
     <li><a href='?choroba=lista'>Pokaż Listę</a></li>
   </ul>
-  <ul>developer:
+  <ul>Developer Story:
     <li><a href='sesja.php'>Zobacz Sesje</a></li>
     <li><a href='zadanie.php'>Strona Główna Zadania</a></li>
   </ul>
