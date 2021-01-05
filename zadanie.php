@@ -117,6 +117,16 @@ if (isset($_GET['przychodnia']))
     //sprawdza czy jest przychodnia do zmiany dla pacjenta
     if (isset($_POST['id']) AND isset($_GET['dopisz']))
      {
+       // #kolumna2 #przychodnia #zmiana
+       $poprzednia_przychodnia = $_SESSION["PACJENCI"][$_POST['id']]->zobaczPrzychodnie();
+       if ($poprzednia_przychodnia != "BRAK")
+        {
+         $_SESSION["PRZYCHODNIE"][$poprzednia_przychodnia]->usunPacjenta($_GET['dopisz']);
+        }
+       else
+        {
+         print "<h1>poprzednia: ".$poprzednia_przychodnia." | podano ".$_GET['dopisz']."</h1>";
+        }
       //korzystam z funkcji (chociaż robię to tylko raz) - dla czytelności kodu
       $sprawdz = PoszukajIdPoNazwiePrzychodni($_POST['przychodnia']);
       print "<span class='info'>";
@@ -248,7 +258,7 @@ else if (isset($_GET['pacjent']))
      if (isset($_GET['kartoteka']))
       { //pokazuję konkretną kartotekę pacjenta
         $_SESSION["PACJENCI"][$_GET['kartoteka']]->szczegoly();
-        print "<a href='?pacjent=lista&kartoteka=".$_GET['kartoteka']."&akcja=usun'>[usuń kartotekę z bazy]</a> ";
+        print "<a href='?pacjent=lista&kartoteka=".$_GET['kartoteka']."&akcja=usun'>[usuń kartotekę z bazy]</a><br/>";
         print "<a href='?przychodnia=lista&dopisz=".$_GET['kartoteka']."'>[zadeklaruj przychodnię]</a>";
       }
      else
