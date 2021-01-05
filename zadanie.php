@@ -40,17 +40,20 @@ if (!isset($_SESSION["NFZ"]))
 ?>
  <p>NFZ
   <ul>Przychodnie
-    <li><a href='?przychodnia=lista'>pokaż listę</a></li>
-    <li><a href='?przychodnia=dodaj'>dodaj przychodnię</a></li>
-    <li><a href='?przychodnia=przypisz'>przypisz pacjenta</a></li>
+    <li><a href='?przychodnia=lista'>Pokaż Listę</a></li>
+    <li><a href='?przychodnia=dodaj'>Dodaj Przychodnię</a></li>
+    <li><a href='?przychodnia=przypisz'>Przypisz Pacjentów</a></li>
   </ul>
   <ul>Pacjenci
-    <li><a href='?pacjent=lista'>pokaż listę</a></li>
-    <li><a href='?pacjent=dodaj'>dodaj pacjenta</a></li>
+    <li><a href='?pacjent=lista'>Pokaż Listę</a></li>
+    <li><a href='?pacjent=dodaj'>Dodaj Kartotekę</a></li>
+  </ul>
+  <ul>Choroby
+    <li><a href='?choroba=lista'>Pokaż Listę</a></li>
   </ul>
   <ul>developer:
-    <li><a href='sesja.php'>zobacz co kryją sesje</a></li>
-    <li><a href='zadanie.php'>widok domyślny</a></li>
+    <li><a href='sesja.php'>Zobacz Sesje</a></li>
+    <li><a href='zadanie.php'>Strona Główna Zadania</a></li>
   </ul>
  </p>
 </div>
@@ -147,10 +150,10 @@ if (isset($_GET['przychodnia']))
  }
 // #kolumna2 #pacjent
 else if (isset($_GET['pacjent']))
-  {
-   print "<p>MENU PACJENTA</p>";
-   // #kolumna2 #pacjent #lista
-   if ($_GET['pacjent'] == "lista")
+ {
+  print "<p>MENU PACJENTA</p>";
+  // #kolumna2 #pacjent #lista
+  if ($_GET['pacjent'] == "lista")
     {
      // #kolumna2 #pacjent #lista #usun
      if (isset($_GET['akcja']))
@@ -184,8 +187,8 @@ else if (isset($_GET['pacjent']))
       }
      print "</span>";
     }
-   // #kolumna2 #pacjent #dodaj
-   else if ($_GET['pacjent'] == "dodaj")
+  // #kolumna2 #pacjent #dodaj
+  else if ($_GET['pacjent'] == "dodaj")
     {
      // #kolumna2 #pacjent #dodaj - instrukcja postępowania
      print "<span class='info'><b>Dodaj Karotekę</b><br/><br/>Samo stworzenie pacjenta nie przypisuje go do żadnej przychodni jaka jest utworzona.<br/>Aby to zrobić skorzystaj z opcji <a href='?przychodnia=przypisz'>[Przychodnie] -> [przypisz pacjenta]</a> po jego utworzeniu (tam zobaczysz tylko tych pacjentów, którzy nie są zadeklarowani).<br/>";
@@ -198,7 +201,29 @@ else if (isset($_GET['pacjent']))
        $_SESSION["PACJENCI"][] = $pacjent;
       }
     }
-  }
+ }
+// #kolumna2 #choroba
+else if (isset($_GET['choroba']))
+ {
+  print "<p>LISTA WSZYSTKICH CHORÓB</p>";
+  if ($_GET['choroba'] == "lista")
+   {
+    // sprawdzam, czy jest coś do dodawania
+    if (isset($_POST['kod']))
+     {
+       $choroba = new Choroba($_POST['kod'],$_POST['nazwa']);
+       $_SESSION["CHOROBY"][$_POST['kod']] = $choroba;
+       $_SESSION["PACJENCI"][$_GET['dopisz']]->zapiszChorobe($_POST['kod']);
+     }
+
+    print "<span class='lista'>";
+    foreach ($_SESSION["CHOROBY"] as $klucze => $wartosci)
+     {
+      print "- ".$wartosci."<br/>";
+     }
+    print "</span>" ;
+   }
+ }
 // #kolumna2 - komunikat powitalny
 else
  {
@@ -239,8 +264,7 @@ if (isset($_GET['przychodnia']))
       }
      print "</span>";
     }
-
-   if ($_GET['przychodnia'] == "dodaj")
+   else if ($_GET['przychodnia'] == "dodaj")
     {// formularz dodawania nowej przychodni
       include "form-nowa-przychodnia.html";
     }
@@ -258,8 +282,10 @@ else if (isset($_GET['pacjent']))
      if (isset($_GET['kartoteka']))
       { //pokazuję konkretną kartotekę pacjenta
         $_SESSION["PACJENCI"][$_GET['kartoteka']]->szczegoly();
+        print "<br/>";
         print "<a href='?pacjent=lista&kartoteka=".$_GET['kartoteka']."&akcja=usun'>[usuń kartotekę z bazy]</a><br/>";
-        print "<a href='?przychodnia=lista&dopisz=".$_GET['kartoteka']."'>[zadeklaruj przychodnię]</a>";
+        print "<a href='?przychodnia=lista&dopisz=".$_GET['kartoteka']."'>[zadeklaruj przychodnię]</a><br/>";
+        print "<a href='?choroba=lista&dopisz=".$_GET['kartoteka']."'>[dodaj chorobę]</a><br/>";
       }
      else
       { // proszę o wybranie kartoteki, aby zobaczyć szczegóły
@@ -277,6 +303,23 @@ else if (isset($_GET['pacjent']))
    {
     print "<p>wybierz akcję z menu</p>";
    }
+ }
+// #kolumna3 #choroba
+else if (isset($_GET['choroba']))
+ {
+   if (isset($_GET['dopisz']))
+    {//formularz obsługujący dopisanie choroby do pacjenta
+    //jest w tym miejscu dla wygody, aby można było zobaczyć jakie choroby są w bazie
+     include "form-dodaj-chorobe-pacjenta.html";
+     print "<a href='?pacjent=lista&kartoteka=".$_GET['dopisz']."'>[wróć do kartoteki pacjenta]</a><br/></span>";
+    }
+   else
+    {
+     print "<span class='info'>Listy chorób tworzą się dynamicznie na podstawie chorób jakie są dodawane z widoku szczegółów dla kartoteki pacjenta.<br/><br/>
+     Pacjenta można odszukać na dwa sposoby:<br/><br/>
+     <a href='?przychodnia=lista'>[Przychodnie] -> [Pokaż Listę]</a> -> <b>[szczegóły]</b> przychodni, lub<br/><br/>
+     <a href='?pacjent=lista'>[Pacjenci] -> [Pokaż Listę]</a> -> <b>[info]</b> danego pacjenta<br/></span>";
+    }
  }
 // #kolumna3 - komunikat powitalny
 else
