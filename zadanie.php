@@ -122,7 +122,8 @@ if (isset($_GET['przychodnia']))
      {
        // #kolumna2 #przychodnia #zmiana
        $poprzednia_przychodnia = $_SESSION["PACJENCI"][$_POST['id']]->zobaczPrzychodnie();
-       if ($poprzednia_przychodnia != "BRAK")
+       $klucze_przychodni = array_keys($_SESSION["PRZYCHODNIE"]);
+       if (array_key_exists($poprzednia_przychodnia, $klucze_przychodni))
         {
          $_SESSION["PRZYCHODNIE"][$poprzednia_przychodnia]->usunPacjenta($_GET['dopisz']);
         }
